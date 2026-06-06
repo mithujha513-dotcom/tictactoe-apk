@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI + Friend Tic Tac Toe</title>
+<style>
+body{font-family:Arial;text-align:center;background:#1e1e2f;color:white}
+.board{display:grid;grid-template-columns:repeat(3,100px);gap:8px;justify-content:center;margin:20px auto}
+.cell{width:100px;height:100px;background:white;color:black;font-size:50px;font-weight:bold;display:flex;align-items:center;justify-content:center;border-radius:10px;cursor:pointer}
+button{padding:10px 20px;margin:5px;font-size:16px}
+</style>
+</head>
+<body>
+<h1>🎮 Tic Tac Toe</h1>
+
+<button onclick="setMode('friend')">👥 Friend Mode</button>
+<button onclick="setMode('ai')">🤖 AI Mode</button>
+
+<h2 id="mode">Mode: Friend</h2>
+<div id="status">Player X Turn</div>
+
+<div class="board" id="board"></div>
+
+<button onclick="restartGame()">Restart</button>
+
+<script>
+let mode='friend';
+let current='X';
+let gameOver=false;
+let board=['','','','','','','','',''];
+
+const wins=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+const boardEl=document.getElementById('board');
+const statusEl=document.getElementById('status');
+
+function createBoard(){
+boardEl.innerHTML='';
+for(let i=0;i<9;i++){
+ let c=document.createElement('div');
+ c.className='cell';
+ c.onclick=()=>move(i);
+ boardEl.appendChild(c);
+}
+}
+function setMode(m){
+mode=m;
+document.getElementById('mode').innerText='Mode: '+(m==='ai'?'AI':'Friend');
+restartGame();
+}
+function move(i){
+if(board[i]||gameOver)return;
+board[i]=current;
+render();
+if(check(current)){statusEl.innerText=current+' Wins!';gameOver=true;return;}
+if(!board.includes('')){statusEl.innerText='Draw!';gameOver=true;return;}
+current=current==='X'?'O':'X';
+statusEl.innerText='Player '+current+' Turn';
+if(mode==='ai'&&current==='O')setTimeout(aiMove,400);
+}
+function aiMove(){
+let empty=[];
+for(let i=0;i<9;i++)if(board[i]==='')empty.push(i);
+if(empty.length===0)return;
+let m=empty[Math.floor(Math.random()*empty.length)];
+move(m);
+}
+function check(p){
+return wins.some(w=>w.every(i=>board[i]===p));
+}
+function render(){
+for(let i=0;i<9;i++)boardEl.children[i].innerText=board[i];
+}
+function restartGame(){
+board=['','','','','','','','',''];
+current='X';
+gameOver=false;
+statusEl.innerText='Player X Turn';
+createBoard();
+}
+createBoard();
+</script>
+</body>
+</html>
